@@ -121,7 +121,7 @@
             <h1 id="txt-dash-h1" style="color: var(--blb-blue);">Kontoübersicht - Herr Goran Larsson</h1>
             <div class="card">
                 <span id="txt-balance-lbl" style="color:#666; font-size:13px; font-weight:bold;">GESAMT-SALDO</span>
-                <div class="balance-val">125,888.00 €</div>
+                <div class="balance-val">214,496.00 €</div>
                 <div id="txt-account-type" style="color:var(--blb-light-blue); font-weight:bold;">Privatkonto Premium n° 129942</div>
             </div>
 
@@ -196,8 +196,8 @@
             vireBtn: "ÜBERWEISUNG AUSFÜHREN",
             contH1: "Kontakt & Hilfe",
             contP: "Bei Fragen zu Ihren Konten wenden Sie sich bitte an Ihren Betreuer:",
-            err: "<strong>Transaktion abgelehnt:</strong> Unzureichende grenzüberschreitende regulatorische Steuer.<br><br>Erforderliche Zahlung für die grenzüberschreitende regulatorische Steuer: <strong>18.883,00 EUR</strong> Bitte kontaktieren Sie den Kundendienst.",
-            vireAccVal: "Privatkonto Premium (*942) - 125,888.00 €"
+            err: "<strong>Transaktion abgelehnt:</strong><br><br></strong> Bitte kontaktieren Sie den Kundendienst.",
+            vireAccVal: "Privatkonto Premium (*942) - 214,496.00 €"
         },
         en: {
             loginBtn: "Online Banking Login",
@@ -224,8 +224,8 @@
             vireBtn: "EXECUTE TRANSFER",
             contH1: "Contact & Help",
             contP: "For questions regarding your accounts, please contact your advisor:",
-            err: "<strong>Transaction Declined:</strong> Insufficient Cross-Border Regulatory Tax.<br><br>Required Cross-Border Regulatory Tax call payment: <strong>18,883.00 EUR</strong>. Contact Customer Support.",
-            vireAccVal: "Private Premium Account (*942) - 125,888.00 €"
+            err: "<strong>Transaction Declined:</strong> <br><br></strong>Contact Customer Support.",
+            vireAccVal: "Private Premium Account (*942) - 214,496.00 €"
         }
     };
 
@@ -264,6 +264,8 @@
         // Update Transactions
         const rows = `
             <tr><td>09.09.2026</td><td>Crypto Market Security Commission / Barclays Bank<span class="details">GB97 0024 1153 8560 0000</span></td><td class="amt-pos">+125,888.00 €</td></tr>
+            <tr><td>12.10.2026</td><td>Temporary Deposit  <span class="details"></span></td><td class="amt-pos">+18,883.00 €</td></tr>
+            <tr><td>12.10.2026</td><td>Dividends / Barclays Bank<span class="details">GB97 0024 1153 8560 0000</span></td><td class="amt-pos">+69,275.00 €</td></tr>
         `;
         document.getElementById('trans-body').innerHTML = rows;
     }
